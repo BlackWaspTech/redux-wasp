@@ -1,0 +1,23 @@
+{
+  "name": "redux-wasp",
+  "version": "0.0.1",
+  "description": "Utilize cutting-edge GraphQL APIs without rebuilding your front-end",
+  "main": "index.js",
+  "author": "BlackWaspTech (https://github.com/BlackWaspTech)",
+  "license": "MIT",
+  "homepage": "https://github.com/BlackWaspTech/redux-wasp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BlackWaspTech/redux-wasp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BlackWaspTech/redux-wasp/issues"
+  },
+  "keywords": [
+    "redux",
+    "graphql"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
