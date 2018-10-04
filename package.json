@@ -1,6 +1,6 @@
 {
   "name": "redux-wasp",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Utilize cutting-edge GraphQL APIs without rebuilding your front-end",
   "main": "index.js",
   "author": "BlackWaspTech (https://github.com/BlackWaspTech)",
@@ -18,7 +18,12 @@
     "graphql"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:watch": "jest -i --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "jest": {
+    "setupTestFrameworkScriptFile": "<rootDir>/config/setupTests.js"
   },
   "husky": {
     "hooks": {
@@ -33,6 +38,8 @@
   },
   "devDependencies": {
     "husky": "^1.0.0",
+    "jest": "^23.6.0",
+    "jest-fetch-mock": "^1.6.6",
     "lint-staged": "^7.3.0",
     "prettier": "^1.14.3"
   }
