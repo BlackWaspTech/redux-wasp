@@ -2,124 +2,118 @@
 
 // TODO: require from the npm library instead
 var query = require('./_internal/testQuery');
+var throwIfMissingDispatch = require('./_internal/throwIfMissingDispatch');
 
-var actions = require('./actions');
-var reducer = require('./reducer');
-var actionCreators = require('./actionCreators');
+var constants = require('./src/constants');
+var reducer = require('./src/reducer');
+var initialState = require('./src/initialState');
+var actions = require('./src/actions');
 
-/**
- * Configures the package; requires the user to run `configureWasp(store)`
- *    before many of the main public methods can be run.
- *
- * This wrapper function allows the store to be saved for later use via closure.
- *
- * @returns {object} - Provides the methods available for public use
- *
- */
 module.exports = (function configureAPI() {
-  var store = null;
+  var dispatch = null;
 
   /**
-   * Saves a reference to the Redux Store.
+   * Accepts the Redux store as middleware and saves the dispatch function
+   * to the current variable environment. This is needed for query/mutatate/subscribe.
    *
-   * @param {object} currentStore - The configured redux store
+   * Learn more about Redux Middleware:
+   * https://redux.js.org/advanced/middleware
    *
-   * @returns {object} - Passes on the store
-   *
-   * @example
-   * // Takes the configured Redux store as a parameter
-   * configureWasp(store)
-   *
-   * @example
-   * // Will pass on the store as a return value
-   * export default configureWasp(store)
-   *
-   * @example
-   * // store.js
-   * import { createStore } from 'redux'
-   * import { configureWasp } from 'redux-wasp'
-   * const store = createStore(reducers)
-   * export default configureWasp(store)
+   * @param {object} store - The redux store
+   * @returns {any} - Run "next(action)" to pass to the next middleware
    */
-  function configureWasp(currentStore) {
-    store = currentStore;
-    return currentStore;
+  function configureWaspMiddleware(store) {
+    return function(next) {
+      return function(action) {
+        dispatch = store.dispatch;
+        return next(action);
+      };
+    };
   }
 
   /**
-   * Adds additional functionality to the `.query()` method from `wasp-graphql`.
-   *
-   * See the `wasp-graphql` docs for additional information:
+   * Returns the variable environment's dispatch method.
+   * For testing purposes only.
+   */
+  function _getSavedDispatch() {
+    return dispatch;
+  }
+
+  /**
+   * Modifies wasp-graphql's query function to fire relevant dispatch objects
    * https://github.com/BlackWaspTech/wasp-graphql
    *
-   * @param {string} url - The endpoint for the request
-   * @param {string} queryFields - The GraphQL query string
-   * @param {object} [config] - Additional configuration settings for the fetch request
-   * @param {function} [callback] - Allows the user to transform the results of .json() before
-   *    it reaches the store; NOTE: This callback should return the response if the user's
-   *    intention is to continue chaining .then() calls
+   * @param {string} url - The url for the intended resource
+   * @param {Object} [init] - The options object
+   * @param {function} [callback] - The user can choose to provide a callback
+   *  that transforms the response's data before it reaches the Redux store
    *
-   * @returns {Promise} - Passes on either the response or the error object
-   *
-   * @example
-   * var queryString = '{ users { id username } }'
-   * query('/api/users', queryString).then(res => res.json())
-   *
-   * @example
-   * var queryString = '{ users { id username } }'
-   * var callback = function(res) {
-   *    console.log(res)
-   *    return res
-   * }
-   * query('/api/users', queryString)
+   * @returns {Promise}
    */
-  function queryWithDispatch() {
-    store.dispatch(actionCreators.requestGraphqlData());
-    var argsLength = arguments.length;
-    if (argsLength > 2 && typeof arguments[argsLength - 1] === 'function') {
-      var callback = arguments[argsLength - 1];
-    }
+  function queryWithDispatch(url, init, callback) {
+    throwIfMissingDispatch(dispatch);
 
-    return query.apply(null, arguments).then(function(res) {
-      var clone = res.clone();
-      var status = clone.status;
-      clone
-        .json()
-        .then(function(json) {
-          if (callback) {
-            return callback(json);
-          }
-          return json;
-        })
-        .then(
-          function(data) {
-            store.dispatch(actionCreators.receiveGraphqlData(data, status));
-            return res;
-          },
-          function(err) {
-            var clone = res.clone();
-            var status = clone.status;
-            store.dispatch(actionCreators.receiveGraphqlError(err, status));
-            return err;
-          }
-        );
-      return res;
-    });
+    // Reject if user provided no arguments
+    if (!url || typeof url !== 'string')
+      return Promise.reject(
+        "Expected a string for 'url' but received: " + typeof url
+      );
+
+    // Curry if user provided only a url
+    if (init === undefined) return runQuery;
+
+    // Run the results of wasp-graphql's modified fetch request, but add
+    //    additional functionality to the Promise chain.
+    return runQuery(init, callback);
+
+    function runQuery(init, callback) {
+      // Pre-flight action
+      dispatch(actions.requestGraphqlData());
+
+      return query(url, init, callback).then(function(res) {
+        // Due to the response's streaming nature, it can be .json()'d only once.
+        //    Therefore, a clone of the response is created. This is to ensure that
+        //    the user continues to receive an object that they're familiar with.
+        var clone = res.clone();
+        var status = clone.status;
+        clone
+          .json()
+          .then(function(json) {
+            if (callback) return callback(json);
+            return json;
+          })
+          .then(
+            function(data) {
+              dispatch(actions.receiveGraphqlData(data, status));
+              return res;
+            },
+            function(err) {
+              var clone = res.clone();
+              var status = clone.status;
+              dispatch(actions.receiveGraphqlError(err, status));
+              return err;
+            }
+          );
+        return res;
+      });
+    }
   }
 
   return {
-    // Configuration method
-    configureWasp: configureWasp,
-    // User methods for interacting with a web API
+    // Configuration methods
+    waspMiddleware: configureWaspMiddleware,
+    _getSavedDispatch: _getSavedDispatch,
+    // User methods for interacting with GraphQL
     query: queryWithDispatch,
     // Constants
-    actions: actions,
-    // Reducer
+    constants: constants,
+    // Reducers & Data
     graphqlReducer: reducer,
+    initialState: initialState,
     // Action creators
-    requestGraphqlData: actionCreators.requestGraphqlData,
-    requestGraphqlData: actionCreators.requestGraphqlData,
-    receiveGraphqlError: actionCreators.receiveGraphqlError,
-    clearGraphqlData: actionCreators.clearGraphqlData
+    requestGraphqlData: actions.requestGraphqlData,
+    requestGraphqlData: actions.requestGraphqlData,
+    receiveGraphqlError: actions.receiveGraphqlError,
+    clearGraphqlData: actions.clearGraphqlData
   };
 })();

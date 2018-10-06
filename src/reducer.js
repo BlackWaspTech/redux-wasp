@@ -1,6 +1,7 @@
 'use strict';
 
-var actions = require('./actions');
+var constants = require('./constants');
+var initialState = require('./initialState');
 
 // --------------------
 // Polyfill for Object.assign
@@ -15,9 +16,7 @@ if (typeof Object.assign != 'function') {
       for (var index = 1; index < arguments.length; index++) {
         var nextSource = arguments[index];
         if (nextSource != null) {
-          // Skip over if undefined or null
           for (var nextKey in nextSource) {
-            // Avoid bugs when hasOwnProperty is shadowed
             if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
               to[nextKey] = nextSource[nextKey];
             }
@@ -32,44 +31,35 @@ if (typeof Object.assign != 'function') {
 }
 // --------------------
 
-var initialState = {
-  isFetching: false,
-  didError: null,
-  status: null,
-  lastUpdated: null,
-  data: null,
-  error: null
-};
-
 function reducer(state, action) {
   state = state || initialState;
 
   switch (action.type) {
-    case actions.WASP_CLEAR_DATA:
+    case constants.CLEAR_GRAPHQL_DATA:
       return Object.assign({}, state, initialState);
 
-    case actions.WASP_REQUEST_DATA:
+    case constants.REQUEST_GRAPHQL_DATA:
       return Object.assign({}, state, {
         isFetching: true
       });
 
-    case actions.WASP_RECEIVE_DATA:
+    case constants.RECEIVE_GRAPHQL_DATA:
       return Object.assign({}, state, {
         isFetching: false,
         didError: false,
         error: null,
         status: action.status,
         data: action.payload,
-        lastUpdated: Date.now()
+        lastUpdated: action.lastUpdated
       });
 
-    case actions.WASP_RECEIVE_ERROR:
+    case constants.RECEIVE_GRAPHQL_ERROR:
       return Object.assign({}, state, {
         isFetching: false,
         didError: true,
         error: action.error,
         status: action.status,
-        lastUpdated: Date.now()
+        lastUpdated: action.lastUpdated
       });
 
     default:

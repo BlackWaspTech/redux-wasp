@@ -1,11 +1,26 @@
 'use strict';
 
-var query = require('../_internal/testQuery');
+var api = require('../index');
 
 describe('query.js', function() {
+  var waspMiddleware = api.waspMiddleware;
+  var query = api.query;
+
+  var store = {
+    getState: jest.fn(function() {
+      return {};
+    }),
+    dispatch: jest.fn()
+  };
+  var next = jest.fn();
+  var invoke = function(action) {
+    waspMiddleware(store)(next)(action);
+  };
+
   beforeEach(() => {
     fetch.resetMocks();
     fetch.mockResponseOnce(JSON.stringify({ data: 42 }));
+    invoke({ type: '@@init' });
   });
 
   it('returns a promise on error', function() {
