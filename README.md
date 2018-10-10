@@ -216,7 +216,7 @@ An optional callback function. Can be used to transform the return value of `res
 
 ### **requestGraphqlData**: `Object<Action> requestGraphqlData();`
 
-### **requestGraphqlData**: `Object<Action> receiveGraphqlData(payload, status[, lastUpdated]);`
+### **receiveGraphqlData**: `Object<Action> receiveGraphqlData(payload, status[, lastUpdated]);`
 
 ### **receiveGraphqlError**: `Object<Action> receiveGraphqlError(error, status[, lastUpdated]);`
 
