@@ -1,0 +1,58 @@
+{
+  "projectName": "redux-wasp",
+  "projectOwner": "BlackWaspTech <https://github.com/BlackWaspTech>",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "dentemple",
+      "name": "Denny Temple",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/10323609?v=4",
+      "profile": "https://dentemple.com/",
+      "contributions": [
+        "code",
+        "doc",
+        "example",
+        "ideas",
+        "review",
+        "test"
+      ]
+    },
+    {
+      "login": "Rcolon100",
+      "name": "Reynolds A Colon",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/19364468?v=4",
+      "profile": "http://www.realized-technologies.com",
+      "contributions": [
+        "design",
+        "ideas",
+        "review"
+      ]
+    },
+    {
+      "login": "kamo31",
+      "name": "kamo31",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/23730068?v=4",
+      "profile": "https://github.com/kamo31",
+      "contributions": [
+        "ideas",
+        "review"
+      ]
+    },
+    {
+      "login": "marceca",
+      "name": "marceca",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/19240166?v=4",
+      "profile": "https://github.com/marceca",
+      "contributions": [
+        "ideas",
+        "review"
+      ]
+    }
+  ]
+}

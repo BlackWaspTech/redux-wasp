@@ -3,7 +3,7 @@
 var api = require('../index');
 
 describe('configureWaspMiddleware.js', function() {
-  var waspMiddleware = api.waspMiddleware;
+  var createWaspMiddleware = api.createWaspMiddleware;
   var _getSavedDispatch = api._getSavedDispatch;
   var query = api.query;
 
@@ -15,15 +15,8 @@ describe('configureWaspMiddleware.js', function() {
   };
   var next = jest.fn();
   var invoke = function(action) {
-    waspMiddleware(store)(next)(action);
+    createWaspMiddleware()(store)(next)(action);
   };
-
-  it('throws an error if middleware is not configured', function() {
-    function callback() {
-      return query('/foo', { fields: 'bar' });
-    }
-    expect(callback).toThrow(Error);
-  });
 
   it('passes through an action', function() {
     var action = { type: 'TEST' };

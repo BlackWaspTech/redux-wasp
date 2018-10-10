@@ -3,7 +3,7 @@
 var api = require('../index');
 
 describe('query.js', function() {
-  var waspMiddleware = api.waspMiddleware;
+  var createWaspMiddleware = api.createWaspMiddleware;
   var query = api.query;
 
   var store = {
@@ -14,7 +14,7 @@ describe('query.js', function() {
   };
   var next = jest.fn();
   var invoke = function(action) {
-    waspMiddleware(store)(next)(action);
+    createWaspMiddleware()(store)(next)(action);
   };
 
   beforeEach(() => {
@@ -32,37 +32,36 @@ describe('query.js', function() {
   });
 
   it('rejects if the second argument is invalid', function() {
-    return query('/foo', 'init').catch(e => expect(e).toBeTruthy());
+    return query('/foo', '').catch(e => expect(e).toBeTruthy());
   });
 
-  it('succeeds when receiving a "fields" prop', function() {
+  it('catches a null second value', function() {
+    return query('/foo', null).catch(e => expect(e).toBeTruthy());
+  });
+
+  it('catches an array second value', function() {
+    return query('/foo', []).catch(e => expect(e).toBeTruthy());
+  });
+
+  it('succeeds when receiving a query string', function() {
+    return query('/foo', '{ foo { bar } }').then(res =>
+      expect(res).toBeTruthy()
+    );
+  });
+
+  it('succeeds when receiving a fields prop', function() {
     return query('/foo', { fields: 'bar' }).then(res =>
       expect(res).toBeTruthy()
     );
   });
 
-  it('succeeds when receiving a "body" prop', function() {
+  it('succeeds when receiving a body prop', function() {
     return query('/foo', { body: 'bar' }).then(res => expect(res).toBeTruthy());
   });
 
-  it('can call an endpoint and return data', function() {
+  it('calls an endpoint and return data', function() {
     return query('/foo', { fields: 'bar' })
       .then(res => res.json())
       .then(json => expect(json.data).toBe(42));
-  });
-
-  it('allows currying a url for later use', function() {
-    var loadedQuery = query('/foo');
-
-    expect(typeof loadedQuery).toBe('function');
-    return loadedQuery({ fields: 'bar' })
-      .then(res => res.json())
-      .then(json => expect(json.data).toBe(42));
-  });
-
-  it('rejects a curried function on receiving a new but invalid argument', function() {
-    var loadedQuery = query('/foo');
-
-    return loadedQuery('bar').catch(e => expect(e).toBeTruthy());
   });
 });
