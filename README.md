@@ -136,7 +136,7 @@ import {
 
   // Action creators
   requestGraphqlData,
-  requestGraphqlData,
+  receiveGraphqlData,
   receiveGraphqlError,
   clearGraphqlData,
 
