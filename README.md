@@ -6,38 +6,31 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-<code>
-v0.2.0 (beta)
-</code>
-<br />
+> **v0.2.0 (beta)**
 
-Utilize cutting-edge GraphQL APIs without rebuilding your front-end application. Provides additional [Redux](https://redux.js.org/) middleware and methods for querying a GraphQL server.
+Utilize cutting-edge GraphQL APIs within existing Redux codebases. Can also automate dispatching the results of a GraphQL query to the Redux Store.
 
-If you would like to utilize the base methods without any automation, check out [wasp-graphql](https://github.com/BlackWaspTech/wasp-graphql).
+Check out [wasp-graphql](https://github.com/BlackWaspTech/wasp-graphql) for the automation-less version of `query/mutate/subscribe`.
 
-## Purpose
+## Installation
 
-[GraphQL - A query language for your API](https://graphql.org/)
+Note: Requires `fetch` to be in scope.
 
-Are you considering an alternative to your REST services? Do you find it impractical to migrate away from using Redux _just_ to call a different type of server? Do you want to remain as interoperable as possible with other technologies?
+**Install via npm:**
 
-`redux-wasp` provides a thin wrapper over the Fetch API. Utilize `query` and `mutate` just like you would a `fetch` request. Automate sending query results to the Redux store with the provided middleware and reducer.
+```js
+npm install --save redux-wasp
+```
 
-Requires `fetch` to be in scope.
+**Install via yarn:**
 
-## Usage
+```js
+yarn add redux-wasp
+```
 
-[How to query a GraphQL server.](https://graphql.org/learn/queries/)
+`redux-wasp` is a micro-library. Only the base methods included in [`wasp-graphql`](https://github.com/BlackWaspTech/wasp-graphql) will be added as a dependency.
 
-### Installation
-
-- via npm: `npm install --save redux-wasp`
-
-- via yarn: `yarn add redux-wasp`
-
-#### Required: `fetch`
-
-There are several ways to include it in your project:
+### Ways to include `fetch`
 
 - Modern browsers ([Can I Use It?](https://caniuse.com/#search=fetch))
 - [`what-wg-fetch`/ Window.Fetch polyfill](https://github.com/github/fetch)
@@ -45,182 +38,155 @@ There are several ways to include it in your project:
 - [`node-fetch`](https://github.com/bitinn/node-fetch)
 - etc.
 
-### Setup
+## How It Works
 
-`redux-wasp` provides two methods, `.query()` and `mutate()`, that will work out-of-the-box. However, to automate applying the query results to the Redux store, custom middleware and reducers are required.
+### GraphQL-specific methods
 
-### 1) Configure the middleware
+[GraphQL - A query language for your API](https://graphql.org/)
+
+Execute a GraphQL `query` just like you would a `fetch` request.
+
+```js
+// Fetch API
+fetch('/my/url/endpoint', { body: JSON.stringify({ query: 'bar' }) }) // returns a Promise
+
+// redux-wasp
+import { query } from 'redux-wasp'
+query('/my/url/endpoint', { body: JSON.stringify({ query: 'bar' }) }) // returns a Promise
+```
+
+Write a basic string to ask for [specific fields](https://graphql.org/learn/queries/#fields) from a GraphQL API.
+
+Given an example string:
+
+```js
+var myFields = `{
+  hero {
+    name
+    # Queries can have comments!
+    friends {
+      name
+    }
+  }
+}`
+```
+
+Fields can be passed alone as the second argument...
+
+```js
+import { query } from 'redux-wasp'
+query('/my/url/endpoint', myFields)
+```
+
+Or as a `fields` property on the init/configuration object...
+
+```js
+import { query } from 'redux-wasp'
+
+query('/my/url/endpoint', { fields: myFields })
+// Any `fetch` init property can be included as well
+query('/my/url/endpoint', { fields: myFields, mode: 'no-cors' })
+```
+
+Or as part of a fully customized `body` property. (ADVANCED)
+
+```js
+import { query } from 'redux-wasp'
+
+// Remember that `body` must be a JSON parsable string. Also, many GQL
+//    servers will expect fields to be sent under a `body.query` property.
+//    GQL variables can be sent under `body.variables`.
+const init = {
+  body: JSON.stringify({
+    query: myFields,
+    variables: '{ "name": "Batman" }'
+  }),
+  credentials: 'include',
+  mode: 'same-origin'
+}
+query('/my/url/endpoint', init)
+```
+
+Requires `fetch`.
+
+### Redux-specific functionality
+
+`redux-wasp` provides custom middleware to automate sending the results of `query` to the Redux store. This functionality is completely optional.
+
+`redux-wasp` also exposes many of the methods here so that you can utilize your own approach while maintaining a common API across projects. See API for more details.
+
+#### Step 1: Configure the middleware
 
 ```js
 // store.js
-import { createWaspMiddleware } from 'redux-wasp';
+import { createWaspMiddleware } from 'redux-wasp'
 
 // `createWaspMiddleware` must be invoked before applying it to the store
-const waspMiddleware = createWaspMiddleware();
-const store = createStore(r, ps, applyMiddleware(waspMiddleware));
-
-// Without a temporary variable...
-// const store = createStore(r, ps, applyMiddleware(createWaspMiddleware())
+const waspMiddleware = createWaspMiddleware()
+const store = createStore(r, p, applyMiddleware(waspMiddleware))
 ```
 
-If you want to apply the middleware but _without_ utilizing the automatic dispatches, then set the `automate` property to `false`.
+```js
+import { createWaspMiddleware } from 'redux-wasp'
+
+// Without a temporary variable...
+const store = createStore(r, p, applyMiddleware(createWaspMiddleware())
+```
+
+`redux-wasp`'s dispatch automation can be deactivated by passing in `{ automate: false }` as the first argument.
 
 ```js
 // store.js
-import { createWaspMiddleware } from 'redux-wasp';
+import { createWaspMiddleware } from 'redux-wasp'
 
-const waspMiddleware = createWaspMiddleware({ automate: false });
-const store = createStore(r, ps, applyMiddleware(waspMiddleware));
+const waspMiddleware = createWaspMiddleware({ automate: false })
 
-// Without a temporary variable...
-// const store = createStore(r, ps, applyMiddleware(createWaspMiddleware({automate: false}))
+const store = createStore(r, ps, applyMiddleware(waspMiddleware))
 ```
 
-### 2) Apply the Reducer
+#### Step 2: Apply the reducer
 
 ```js
 // reducers.js
-import { graphqlReducer } from 'redux-wasp';
+import { graphqlReducer } from 'redux-wasp'
 
 const reducers = combineReducers({
-  foobar: graphqlReducer
-});
-
-export default reducers;
+  // Can name the property here to whatever you want
+  graphql: graphqlReducer
+})
 ```
 
 In the event of API collisions, an alternate name has been provided:
 
 ```js
 // reducers.js
-import { waspGraphqlReducer } from 'redux-wasp';
+import { waspGraphqlReducer } from 'redux-wasp'
 
 const reducers = combineReducers({
-  foobar: waspGraphqlReducer
-});
-
-export default reducers;
+  graphql: waspGraphqlReducer
+})
 ```
 
-### 3) Import `query` or `mutate` when needed, and use accordingly
+#### Now, you may use `query` to your heart's content!
 
-`query()` and `mutate()` will now fire custom dispatches that will update the Redux store as needed.
+With the middleware and reducer configured
+
+Here is the initial state provided by `redux-wasp`:
+
+```js
+{
+  isFetching: false,
+  didError: false,
+  status: null,
+  lastUpdated: null,
+  data: null,
+  error: null
+}
+```
 
 ## API
 
-### Quick Reference
-
-```js
-import {
-  // Configures the package; required if the user wants to utilize state automation
-  createWaspMiddleware,
-
-  // Custom reducer; required if the user wants to utilize state automation
-  graphqlReducer,
-  waspGraphqlReducer // same as graphqlReducer
-
-  // Modify the initial state provided by the reducer
-  initialState,
-
-  // Fetches data from an endpoint
-  query,
-  mutate,
-
-  // Available action constants:
-  //    constants.WASP_IDENTIFIER
-  //    constants.REQUEST_GRAPHQL_DATA
-  //    constants.RECEIVE_GRAPHQL_DATA
-  //    constants.RECEIVE_GRAPHQL_ERROR
-  //    constants.CLEAR_GRAPHQL_DATA
-  constants,
-
-  // Action creators
-  requestGraphqlData,
-  receiveGraphqlData,
-  receiveGraphqlError,
-  clearGraphqlData,
-
-
-} from 'redux-wasp'
-```
-
-### **createWaspMiddleware**: `@param {Object} [config]`
-
-Returns a middleware function that connects `redux-wasp` to `store.dispatch()`.
-
-Takes an optional configuration object. If config's `automate` property is set to false, then `redux-wasp` won't fire custom dispatches automatically.
-
-### **graphqlReducer**
-
-Watches for the dispatches sent by the `query()` and `mutate()` methods, and sends applies the results to the Redux store.
-
-### **waspGraphqlReducer**
-
-Same as `graphqlReducer`. Provided under an additional API in the event of name collisions.
-
-### **initialState**
-
-### **query**: `Promise<Response> query(url, init[, callback]);`
-
-- 1st Argument: `@param {string} url`
-
-The resource to be targetted by the XmlHttpRequest. Must be a string.
-
-- 2nd Argument: `@param {(string|Object)} init`
-
-Can be the query string or a full configuration object.
-
-If the user provides a configuration object, they must also include the query string either as a `.fields` property (standard) or on the `.body` property ([JSON parsable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)).
-
-- 3rd Argument: `@param {function} [transform]`
-
-An optional callback function. Can be used to transform the return value of `response.json()` into a more preferred format. **`transform`'s return value is what will be passed to the Redux store.**
-
-Example:
-
-```js
-// actionCreators.js
-export function queryForMessages(url, fields) {
-  return dispatch => {
-    const transform = json => json.data.messages;
-    return query(url, fields, transform);
-  };
-}
-
-// Before:
-data = {
-  data: {
-    messages: ['a', 'b', 'c']
-  }
-};
-
-// After:
-data = ['a', 'b', 'c'];
-```
-
-### **mutate**: `Promise<Response> mutate(url, init[, callback]);`
-
-- `@param {string} url`
-
-The resource to be targetted by the XmlHttpRequest. Must be a string.
-
-- `@param {(string|Object)} init`
-
-Can be the mutation string or a full configuration object.
-
-If the user provides a configuration object, they must also include the mutation string either as a `.fields` property (standard) or on the `.body` property ([JSON parsable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)).
-
-- 3rd Argument: `@param {function} [transform]`
-
-An optional callback function. Can be used to transform the return value of `response.json()` into a more preferred format. **`transform`'s return value is what will be passed to the Redux store.**
-
-### **requestGraphqlData**: `Object<Action> requestGraphqlData();`
-
-### **receiveGraphqlData**: `Object<Action> receiveGraphqlData(payload, status[, lastUpdated]);`
-
-### **receiveGraphqlError**: `Object<Action> receiveGraphqlError(error, status[, lastUpdated]);`
-
-### **clearGraphqlData**: `Object<Action> clearGraphqlData();`
+TODO
 
 ---
 
