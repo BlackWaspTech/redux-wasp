@@ -10,11 +10,13 @@
 
 Utilize cutting-edge GraphQL APIs within existing Redux codebases. Can also automate dispatching the results of a GraphQL query to the Redux Store.
 
-Check out [wasp-graphql](https://github.com/BlackWaspTech/wasp-graphql) for the automation-less version of `query/mutate/subscribe`.
+**For additional interoperability with Apollo, check out [`redux-wasp-apollo`](https://github.com/BlackWaspTech/redux-wasp-apollo).**
+
+**For base query, mutate, and subscribe methods without Redux, check out [`wasp-graphql`](https://github.com/BlackWaspTech/wasp-graphql).**
+
+**For a live, full-stack application showcasing `redux-wasp` in action, [go here](https://github.com/BlackWaspTech/the-buzz).**
 
 ## Installation
-
-Note: Requires `fetch` to be in scope.
 
 **Install via npm:**
 
@@ -30,6 +32,8 @@ yarn add redux-wasp
 
 `redux-wasp` is a micro-library. Only the base methods included in [`wasp-graphql`](https://github.com/BlackWaspTech/wasp-graphql) will be added as a dependency.
 
+Requires `fetch` to be in scope.
+
 ### Ways to include `fetch`
 
 - Modern browsers ([Can I Use It?](https://caniuse.com/#search=fetch))
@@ -40,7 +44,7 @@ yarn add redux-wasp
 
 ## How It Works
 
-### GraphQL-specific methods
+### GraphQL methods
 
 [GraphQL - A query language for your API](https://graphql.org/)
 
@@ -48,14 +52,14 @@ Execute a GraphQL `query` just like you would a `fetch` request.
 
 ```js
 // Fetch API
-fetch('/my/url/endpoint', { body: JSON.stringify({ query: 'bar' }) }) // returns a Promise
+fetch('/my/url/endpoint', { body: JSON.stringify({ query: 'bar' }) }); // returns a Promise
 
 // redux-wasp
-import { query } from 'redux-wasp'
-query('/my/url/endpoint', { body: JSON.stringify({ query: 'bar' }) }) // returns a Promise
+import { query } from 'redux-wasp';
+query('/my/url/endpoint', { body: JSON.stringify({ query: 'bar' }) }); // returns a Promise
 ```
 
-Write a basic string to ask for [specific fields](https://graphql.org/learn/queries/#fields) from a GraphQL API.
+Write a basic string to ask for [specific fields](https://graphql.org/learn/queries/#fields) from a GraphQL endpoint.
 
 Given an example string:
 
@@ -63,35 +67,34 @@ Given an example string:
 var myFields = `{
   hero {
     name
-    # Queries can have comments!
     friends {
       name
     }
   }
-}`
+}`;
 ```
 
 Fields can be passed alone as the second argument...
 
 ```js
-import { query } from 'redux-wasp'
-query('/my/url/endpoint', myFields)
+import { query } from 'redux-wasp';
+query('/my/url/endpoint', myFields);
 ```
 
 Or as a `fields` property on the init/configuration object...
 
 ```js
-import { query } from 'redux-wasp'
+import { query } from 'redux-wasp';
 
-query('/my/url/endpoint', { fields: myFields })
+query('/my/url/endpoint', { fields: myFields });
 // Any `fetch` init property can be included as well
-query('/my/url/endpoint', { fields: myFields, mode: 'no-cors' })
+query('/my/url/endpoint', { fields: myFields, mode: 'no-cors' });
 ```
 
-Or as part of a fully customized `body` property. (ADVANCED)
+Or as part of a fully customized `body` property (ADVANCED).
 
 ```js
-import { query } from 'redux-wasp'
+import { query } from 'redux-wasp';
 
 // Remember that `body` must be a JSON parsable string. Also, many GQL
 //    servers will expect fields to be sent under a `body.query` property.
@@ -103,13 +106,27 @@ const init = {
   }),
   credentials: 'include',
   mode: 'same-origin'
-}
-query('/my/url/endpoint', init)
+};
+query('/my/url/endpoint', init);
 ```
 
-Requires `fetch`.
+Then, you can unpack the results of query with `.json()`:
 
-### Redux-specific functionality
+```js
+import { query } from 'wasp-graphql';
+
+query('/my/url/endpoint', init)
+  .then(response => {
+    console.log(response.json()); // my data
+  })
+  .catch(error => {
+    console.log(error); // my error
+  });
+```
+
+[As a thin wrapper over the Fetch API, anything that applies to `fetch` will also apply to `query` as well.](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
+
+### Redux functionality
 
 `redux-wasp` provides custom middleware to automate sending the results of `query` to the Redux store. This functionality is completely optional.
 
@@ -119,11 +136,11 @@ Requires `fetch`.
 
 ```js
 // store.js
-import { createWaspMiddleware } from 'redux-wasp'
+import { createWaspMiddleware } from 'redux-wasp';
 
 // `createWaspMiddleware` must be invoked before applying it to the store
-const waspMiddleware = createWaspMiddleware()
-const store = createStore(r, p, applyMiddleware(waspMiddleware))
+const waspMiddleware = createWaspMiddleware();
+const store = createStore(r, p, applyMiddleware(waspMiddleware));
 ```
 
 ```js
@@ -137,34 +154,34 @@ const store = createStore(r, p, applyMiddleware(createWaspMiddleware())
 
 ```js
 // store.js
-import { createWaspMiddleware } from 'redux-wasp'
+import { createWaspMiddleware } from 'redux-wasp';
 
-const waspMiddleware = createWaspMiddleware({ automate: false })
+const waspMiddleware = createWaspMiddleware({ automate: false });
 
-const store = createStore(r, ps, applyMiddleware(waspMiddleware))
+const store = createStore(r, ps, applyMiddleware(waspMiddleware));
 ```
 
 #### Step 2: Apply the reducer
 
 ```js
 // reducers.js
-import { graphqlReducer } from 'redux-wasp'
+import { graphqlReducer } from 'redux-wasp';
 
 const reducers = combineReducers({
   // Can name the property here to whatever you want
   graphql: graphqlReducer
-})
+});
 ```
 
 In the event of API collisions, an alternate name has been provided:
 
 ```js
 // reducers.js
-import { waspGraphqlReducer } from 'redux-wasp'
+import { waspGraphqlReducer } from 'redux-wasp';
 
 const reducers = combineReducers({
   graphql: waspGraphqlReducer
-})
+});
 ```
 
 #### Now, you may use `query` to your heart's content!
@@ -184,9 +201,226 @@ Here is the initial state provided by `redux-wasp`:
 }
 ```
 
+---
+
 ## API
 
-TODO
+### Quick Reference
+
+```js
+import {
+  // For interacting with a GQL server
+  query,
+  mutate,
+
+  // For configuration Redux automation
+  createWaspMiddleware,
+  graphqlReducer,
+  waspGraphqlReducer, // Same as graphqlReducer
+
+  // For interacting with or overwriting
+  //    specific parts of redux-wasp
+  constants, // Action constants
+  initialState, // Gets passed into graphqlReducer
+  requestGraphqlData, // Action creator
+  requestGraphqlData, // Action creator
+  receiveGraphqlError, // Action creator
+  clearGraphqlData // Action creator
+} from 'redux-wasp';
+```
+
+### `createWaspMiddleware([config: Object])`
+
+```js
+/**
+ * Generates a custom middleware function.  This middleware saves the dispatch function to the
+ * current variable environment so that query/mutatate/subscribe can auto-dispatch actions.
+ *
+ * SYNTAX: createWaspMiddleware(config)
+ *
+ * @param {Object} [config] - Optional settings
+ * @param {boolean} [config.automate] - Deactivates the ability to auto-dispatch
+ *
+ * @returns {function} - Returns Redux Middleware
+ */
+
+import { createWaspMiddleware } from 'redux-wasp';
+```
+
+### `query(url: string, init: string | Object[, transform: function])`
+
+```js
+/**
+ * Provides a thin, GQL-compliant wrapper over the Fetch API.
+ *
+ * SYNTAX: query(url, init, transform)
+
+ * @param {string} url - The url for the intended resource
+ * @param {(string|Object)} init - Can be a string of fields or a configuration object
+ * @param {function} transform - The user can choose to provide a callback that transform
+ *    the response's data before it reaches the Redux store
+ * @param {string} [init.fields] - GQL fields: Will be added to the body of the request
+ * @param {string} [init.variables] - GQL variables: Will be added to the body of the request
+ * // For additional valid arguments, see the Fetch API:
+ * // https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch
+ *
+ * Default init properties
+ * @param {string} [init.method='POST']
+ * @param {Object} [init.headers={ 'Content-Type': 'application/json', 'Accept': 'application/json' }]
+ *
+ * @returns {Promise}
+ */
+
+import { query } from 'redux-wasp';
+```
+
+### `mutate(url: string, init: string | Object[, transform: function])`
+
+```js
+/**
+ * Provides a thin, GQL-compliant wrapper over the Fetch API.
+ *
+ * SYNTAX: mutate(url, init, transform)
+
+ * @param {string} url - The url for the intended resource
+ * @param {(string|Object)} init - Can be a string of fields or a configuration object
+ * @param {function} transform - The user can choose to provide a callback that transform
+ *    the response's data before it reaches the Redux store
+ * @param {string} [init.fields] - GQL fields: Will be added to the body of the request
+ * @param {string} [init.variables] - GQL variables: Will be added to the body of the request
+ * // For additional valid arguments, see the Fetch API:
+ * // https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch
+ *
+ * Default init properties
+ * @param {string} [init.method='POST']
+ * @param {Object} [init.headers={ 'Content-Type': 'application/json', 'Accept': 'application/json' }]
+ *
+ * @returns {Promise}
+ */
+
+import { mutate } from 'redux-wasp';
+```
+
+### `constants: Object`
+
+```js
+/**
+ * Action Types
+ *
+ * var constants = {
+ *    WASP_IDENTIFIER: '__WASP__',
+ *    REQUEST_GRAPHQL_DATA: 'REQUEST_GRAPHQL_DATA',
+ *    RECEIVE_GRAPHQL_DATA: 'RECEIVE_GRAPHQL_DATA',
+ *    RECEIVE_GRAPHQL_ERROR: 'RECEIVE_GRAPHQL_ERROR',
+ *    CLEAR_GRAPHQL_DATA: 'CLEAR_GRAPHQL_DATA'
+ * }
+ */
+
+import { constants } from 'redux-wasp';
+```
+
+### `initialState: Object`
+
+```js
+/**
+ * var initialState = {
+ *    isFetching: false,
+ *    didError: false,
+ *    status: null,
+ *    lastUpdated: null,
+ *    data: null,
+ *    error: null
+ * }
+ */
+
+import { initialState } from 'redux-wasp';
+```
+
+### `graphqlReducer(state: Object, action: Object)`
+
+### `waspGraphqlReducer(state: Object, action: Object)`
+
+```js
+/**
+ * Updates the Redux Store.
+ *
+ * @param {Object} state - Previous Redux Store
+ * @param {Object} action - Description of the changes to be made
+ *
+ * @returns {Object} - The new state
+ */
+
+import { graphqlReducer } from 'redux-wasp';
+import { waspGraphqlReducer } from 'redux-wasp';
+```
+
+### `requestGraphqlData()`
+
+```js
+/**
+ * Runs prior to executing a query.
+ *
+ * SYNTAX: requestGraphqlData()
+ *
+ * @returns {Object} - Action
+ */
+
+import { requestGraphqlData } from 'redux-wasp';
+```
+
+### `receiveGraphqlData(payload: any, status: number[, lastUpdated: number])`
+
+```js
+/**
+ * Runs if a query is successful.
+ *
+ * SYNTAX: receiveGraphqlData(payload, status, lastUpdated)
+ *
+ * @param {any} payload - The data to be sent to the Redux Store
+ * @param {number} status - The response object's status code
+ * @param {number} [lastUpdated] - Date when the dispatch is executed;
+ *    can be optionally passed in for testing purposes, otherwise it is
+ *    set to the return value of Date.now() by default
+ *
+ * @returns {Object} - Action
+ */
+
+import { receiveGraphqlData } from 'redux-wasp';
+```
+
+### `receiveGraphqlError(error: string, status: number[, lastUpdated: number])`
+
+```js
+/**
+ * Runs if a query returns an error.
+ *
+ * SYNTAX: receiveGraphqlError(error, status, lastUpdated)
+ *
+ * @param {string} error - The response object's error message
+ * @param {number} status - Currently returns 0
+ * @param {number} [lastUpdated] - Date when the dispatch is executed;
+ *    can be optionally passed in for testing purposes, otherwise it is
+ *    set to the return value of Date.now() by default
+ *
+ * @returns {Object} - Action
+ */
+
+import { receiveGraphqlError } from 'redux-wasp';
+```
+
+### `clearGraphqlData()`
+
+```js
+/**
+ * Re-initializes state.
+ *
+ * SYNTAX: clearGraphqlData()
+ *
+ * @returns {Object} - Action
+ */
+
+import { clearGraphqlData } from 'redux-wasp';
+```
 
 ---
 
@@ -213,4 +447,4 @@ Read our Code of Conduct [here](CODE-OF-CONDUCT.md).
 
 ## License
 
-Open Sourced under the [MIT License](LICENSE).
+Free and Open Source under the [MIT License](LICENSE).

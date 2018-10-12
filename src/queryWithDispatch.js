@@ -5,13 +5,22 @@ var automate = require('../_internal/automate');
 var query = require('../_internal/testQuery');
 
 /**
- * Modifies wasp-graphql's query function to fire relevant dispatch objects
- * https://github.com/BlackWaspTech/wasp-graphql
+ * Provides a thin, GQL-compliant wrapper over the Fetch API.
  *
+ * SYNTAX: query(url, init, transform)
+
  * @param {string} url - The url for the intended resource
- * @param {Object} [init] - The options object
- * @param {function} [transform] - The user can choose to provide a callback
- *  that transforms the response's data before it reaches the Redux store
+ * @param {(string|Object)} init - Can be a string of fields or a configuration object
+ * @param {function} transform - The user can choose to provide a callback that transform
+ *    the response's data before it reaches the Redux store
+ * @param {string} [init.fields] - GQL fields: Will be added to the body of the request
+ * @param {string} [init.variables] - GQL variables: Will be added to the body of the request
+ * // For additional valid arguments, see the Fetch API:
+ * // https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch
+ *
+ * Default init properties
+ * @param {string} [init.method='POST']
+ * @param {Object} [init.headers={ 'Content-Type': 'application/json', 'Accept': 'application/json' }]
  *
  * @returns {Promise}
  */
