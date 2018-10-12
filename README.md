@@ -430,11 +430,9 @@ import { clearGraphqlData } from 'redux-wasp';
 
 ## Contributors
 
-Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):
-
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore -->
-| [<img src="https://avatars2.githubusercontent.com/u/10323609?v=4" width="100px;"/><br /><sub><b>Denny Temple</b></sub>](https://dentemple.com/)<br />[💻](#code-dentemple "Code") [📖](#documentation-dentemple "Documentation") [💡](#example-dentemple "Examples") [🤔](#ideas-dentemple "Ideas, Planning, & Feedback") [👀](#review-dentemple "Reviewed Pull Requests") [⚠️](#tests-dentemple "Tests") | [<img src="https://avatars2.githubusercontent.com/u/19364468?v=4" width="100px;"/><br /><sub><b>Reynolds A Colon</b></sub>](http://www.realized-technologies.com)<br />[🎨](#design-Rcolon100 "Design") [🤔](#ideas-Rcolon100 "Ideas, Planning, & Feedback") [👀](#review-Rcolon100 "Reviewed Pull Requests") | [<img src="https://avatars2.githubusercontent.com/u/23730068?v=4" width="100px;"/><br /><sub><b>kamo31</b></sub>](https://github.com/kamo31)<br />[🤔](#ideas-kamo31 "Ideas, Planning, & Feedback") [👀](#review-kamo31 "Reviewed Pull Requests") | [<img src="https://avatars2.githubusercontent.com/u/19240166?v=4" width="100px;"/><br /><sub><b>marceca</b></sub>](https://github.com/marceca)<br />[🤔](#ideas-marceca "Ideas, Planning, & Feedback") [👀](#review-marceca "Reviewed Pull Requests") |
+| [<img src="https://avatars2.githubusercontent.com/u/10323609?v=4" width="100px;"/><br /><sub><b>Denny Temple</b></sub>](https://dentemple.com/)<br /> | [<img src="https://avatars2.githubusercontent.com/u/19364468?v=4" width="100px;"/><br /><sub><b>Reynolds A Colon</b></sub>](http://www.realized-technologies.com)<br /> | [<img src="https://avatars2.githubusercontent.com/u/23730068?v=4" width="100px;"/><br /><sub><b>kamo31</b></sub>](https://github.com/kamo31)<br /> | [<img src="https://avatars2.githubusercontent.com/u/19240166?v=4" width="100px;"/><br /><sub><b>marceca</b></sub>](https://github.com/marceca)<br /> |
 | :---: | :---: | :---: | :---: |
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
