@@ -21,7 +21,7 @@ module.exports = {
   initialState: initialState,
   // Action creators
   requestGraphqlData: actions.requestGraphqlData,
-  requestGraphqlData: actions.requestGraphqlData,
+  receiveGraphqlData: actions.receiveGraphqlData,
   receiveGraphqlError: actions.receiveGraphqlError,
   clearGraphqlData: actions.clearGraphqlData
 };

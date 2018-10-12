@@ -3,13 +3,15 @@ var dispatch = require('../_internal/dispatch');
 var automate = require('../_internal/automate');
 
 /**
- * Accepts the Redux store as middleware and saves the dispatch function
- * to the current variable environment. This is needed for query/mutatate/subscribe.
+ * Generates a custom middleware function.  This middleware saves the dispatch function to the
+ * current variable environment so that query/mutatate/subscribe can auto-dispatch actions.
+ *
+ * SYNTAX: createWaspMiddleware(config)
  *
  * @param {Object} [config] - Optional settings
- * @param {boolean} [config.automate] - Deactivates the use of dispatches by query/mutation/subscribe
+ * @param {boolean} [config.automate] - Deactivates the ability to auto-dispatch
  *
- * @returns {any} - Passes on to the next middleware
+ * @returns {function} - Returns Redux Middleware
  */
 function createWaspMiddleware(config) {
   if (config && typeof config.automate === 'boolean') {
