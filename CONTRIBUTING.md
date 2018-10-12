@@ -9,7 +9,9 @@ Feel free to take a moment to view our [Code of Conduct](CODE-OF-CONDUCT) as wel
 ## Primary Goals for `redux-wasp
 
 1 - Interoperable: Reduce the stress of calling GraphQL endpoints from a Redux codebase
+
 2 - Small: Avoid bringing in unnecessary dependencies
+
 3 - Easy: Maintain an intuitive, predictable API
 
 ## Ways to get involved
