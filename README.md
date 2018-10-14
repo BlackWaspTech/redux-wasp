@@ -12,7 +12,7 @@ Utilize cutting-edge GraphQL APIs within existing Redux codebases. Can also auto
 
 **For additional interoperability with Apollo, check out [`redux-wasp-apollo`](https://github.com/BlackWaspTech/redux-wasp-apollo).**
 
-**For base query, mutate, and subscribe methods without Redux, check out [`wasp-graphql`](https://github.com/BlackWaspTech/wasp-graphql).**
+**For base query, mutation, and subscribe methods without Redux, check out [`wasp-graphql`](https://github.com/BlackWaspTech/wasp-graphql).**
 
 **For a live, full-stack application showcasing `redux-wasp` in action, [go here](https://github.com/BlackWaspTech/the-buzz).**
 
@@ -200,7 +200,7 @@ Here is the initial state provided by `redux-wasp`:
 import {
   // For interacting with a GQL server
   query,
-  mutate,
+  mutation,
 
   // For configuration Redux automation
   createWaspMiddleware,
@@ -263,32 +263,9 @@ import { createWaspMiddleware } from 'redux-wasp';
 import { query } from 'redux-wasp';
 ```
 
-### `mutate(url: string, init: string | Object[, transform: function])`
+### `mutation(url: string, init: string | Object[, transform: function])`
 
-```js
-/**
- * Provides a thin, GQL-compliant wrapper over the Fetch API.
- *
- * SYNTAX: mutate(url, init, transform)
-
- * @param {string} url - The url for the intended resource
- * @param {(string|Object)} init - Can be a string of fields or a configuration object
- * @param {function} transform - The user can choose to provide a callback that transform
- *    the response's data before it reaches the Redux store
- * @param {string} [init.fields] - GQL fields: Will be added to the body of the request
- * @param {string} [init.variables] - GQL variables: Will be added to the body of the request
- * // For additional valid arguments, see the Fetch API:
- * // https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch
- *
- * Default init properties
- * @param {string} [init.method='POST']
- * @param {Object} [init.headers={ 'Content-Type': 'application/json', 'Accept': 'application/json' }]
- *
- * @returns {Promise}
- */
-
-import { mutate } from 'redux-wasp';
-```
+Alias for `query`.
 
 ### `constants: Object`
 

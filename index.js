@@ -12,7 +12,7 @@ module.exports = {
   createWaspMiddleware: createWaspMiddleware,
   // User methods for interacting with GraphQL
   query: queryWithDispatch,
-  mutate: queryWithDispatch,
+  mutation: queryWithDispatch,
   // Constants
   constants: constants,
   // Reducers & Data
