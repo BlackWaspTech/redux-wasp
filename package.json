@@ -38,6 +38,9 @@
       "git add"
     ]
   },
+  "dependencies": {
+    "wasp-graphql": "^0.2.0"
+  },
   "devDependencies": {
     "all-contributors-cli": "^5.4.0",
     "graphql": "^14.0.2",
