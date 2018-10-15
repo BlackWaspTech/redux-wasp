@@ -1,8 +1,7 @@
+var { query } = require('wasp-graphql');
+
 var dispatch = require('../_internal/dispatch');
 var automate = require('../_internal/automate');
-
-// TODO: require from the npm library instead
-var query = require('../_internal/testQuery');
 
 /**
  * Provides a thin, GQL-compliant wrapper over the Fetch API.

@@ -1,6 +1,6 @@
 'use strict';
 
-var query = require('../_internal/testQuery');
+var query = require('../config/testQuery');
 
 describe('query.js', function() {
   beforeEach(() => {

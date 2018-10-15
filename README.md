@@ -12,7 +12,7 @@ Utilize cutting-edge GraphQL APIs within existing Redux codebases. Can also auto
 
 **For additional interoperability with Apollo, check out [`redux-wasp-apollo`](https://github.com/BlackWaspTech/redux-wasp-apollo).**
 
-**For base query, mutation, and subscribe methods without Redux, check out [`wasp-graphql`](https://github.com/BlackWaspTech/wasp-graphql).**
+**To use the base query and mutation methods without Redux, check out [`wasp-graphql`](https://github.com/BlackWaspTech/wasp-graphql).**
 
 **For a live, full-stack application showcasing `redux-wasp` in action, [go here](https://github.com/BlackWaspTech/the-buzz).**
 
@@ -223,7 +223,7 @@ import {
 ```js
 /**
  * Generates a custom middleware function.  This middleware saves the dispatch function to the
- * current variable environment so that query/mutatate/subscribe can auto-dispatch actions.
+ * current variable environment so that query/mutatate can auto-dispatch actions.
  *
  * SYNTAX: createWaspMiddleware(config)
  *
@@ -389,6 +389,10 @@ import { clearGraphqlData } from 'redux-wasp';
 ```
 
 ---
+
+## Changelog
+
+View the [Changelog](CHANGELOG.md)
 
 ## Contributing
 
