@@ -31,11 +31,20 @@ Feel free to take a moment to view our [Code of Conduct](CODE-OF-CONDUCT) as wel
 
 All contributions must be offered via [Pull Request](https://help.github.com/articles/about-pull-requests/) and be approved by a maintainer.
 
+Make all pull requests to the `master` branch.
+
 ### Code Style
 
 There's no need to worry about style. [Prettier](https://prettier.io/) has been configured, and it'll auto-format your code as soon as it's committed.
 
 See the [Airbnb Style Guide](https://github.com/airbnb/javascript) for more information.
+
+### Javascript/ES Version
+
+- All **release code** should be as **ES5**-compatible as possible (with no build tools required)
+- All **dev-only** code should at least be compatible with **Node.js v6**
+  - Includes many common ES6 features such as `const` and `let`
+  - Does not include `class` or `import` syntax
 
 ### Continuous Integration (CI)
 
@@ -52,5 +61,7 @@ Available commands:
 - `yarn test:coverage` / `npm run test:coverage` to generate a coverage report
 
 ---
+
+View the [Changelog](CHANGELOG.md)
 
 Return to [README](README.md)
