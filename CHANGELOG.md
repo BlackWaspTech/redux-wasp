@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.1 beta
+
+- Hotfix; previous version was published without a necessary `pre-release` update
+- Updated docs & tests
+
 ## v0.2.0 beta
 
 - Significant revision of the API
