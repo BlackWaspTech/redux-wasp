@@ -1,4 +1,4 @@
-var { query } = require('wasp-graphql');
+var query = require('wasp-graphql').query;
 
 var dispatch = require('../_internal/dispatch');
 var automate = require('../_internal/automate');
