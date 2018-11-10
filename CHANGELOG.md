@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.2.2 beta
+
+- Fixed accidental usage of ES6 syntax
+- Updated dev packages
+  - Skipped updating `jest-fetch-mock` due to its newest update breaking our tests
+- Added Github templates
+- Minor update to Jest settings (now ignoring node_modules code path)
+- Minor update to Travis build (now caches node_modules)
+- Added slight clarification to LICENSE (still MIT)
+
 ## v0.2.1 beta
 
 - Hotfix; previous version was published without a necessary `pre-release` update
