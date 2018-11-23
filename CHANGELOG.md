@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.3 beta
+
+- Correctly placed `wasp-graphql` in dependencies instead of devDependencies
+- Updated `jest` to resolve potential security issue
+  - Affects dev only
+
 ## v0.2.2 beta
 
 - Fixed accidental usage of ES6 syntax
